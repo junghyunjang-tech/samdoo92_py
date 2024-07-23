@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Flask app</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5; /* 따뜻한 배경색 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative; /* 로딩 오버레이를 위해 추가 */
+            background-image: url('{{ url_for('static', filename='images/background.jpg') }}'); /* NICE 그룹의 배경 이미지 */
+            background-size: cover; /* 배경 이미지 크기 조정 */
+            background-position: center; /* 배경 이미지 위치 조정 */
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 150px; /* 로고 크기 조정 */
+        }
+        .main-content {
+            display: flex;
+            width: 70%; /* 전체 너비를 조정 */
+            height: 70vh; /* 세로를 조정 */
+            background-color: rgba(255, 255, 255, 0.9); /* 반투명 흰색 배경 */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative; /* 로딩 오버레이를 위해 추가 */
+            z-index: 1; /* 로딩 오버레이보다 뒤로 보내기 위해 추가 */
+        }
+        .image-container {
+            width: 25%; /* 이미지 컨테이너 너비를 조정 */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* 세로 가운데 정렬 추가 */
+            margin-right: 20px; /* 컨테이너와의 간격 추가 */
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover; /* 비율을 유지하면서 이미지 크기를 조정 */
+        }
+        .container {
+            width: 50%; /* 텍스트 컨테이너 너비를 조정 */
+            height: 100%; /* 텍스트 컨테이너 높이를 조정 */
+            overflow-y: auto; /* 세로 스크롤바 추가 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .messages {
+            flex: 1; /* 메시지 영역이 폼 위에 위치하게 함 */
+            overflow-y: auto; /* 긴 메시지의 경우 스크롤 가능 */
+            padding-right: 10px; /* 스크롤바 여백 추가 */
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .message.assistant {
+            background-color: #e0f7fa;
+        }
+        .message.user {
+            background-color: #dcedc8;
+        }
+        form {
+            display: flex;
+            flex-direction: column; /* 버튼과 텍스트박스가 수직으로 배치되도록 설정 */
+            justify-content: center;
+            align-items: flex-start; /* 왼쪽 정렬 */
+            margin-top: 20px;
+            gap: 10px; /* 버튼 사이 간격 추가 */
+            width: 100%;
+        }
+        textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%; /* 너비를 조정하여 textarea와 버튼이 같은 줄에 있게 함 */
+            box-sizing: border-box;
+            height: 100px; /* 높이를 조정하여 입력 영역을 넓게 함 */
+        }
+        input[type="submit"], input[type="button"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50; /* 예쁜 초록색 */
+            color: white;
+            cursor: pointer;
+            font-weight: 500; /* 글씨 두께 조정 */
+            width: 100px; /* 버튼 너비를 고정 */
+            margin-right: 10px; /* 버튼 사이 간격 추가 */
+        }
+        input[type="button"] {
+            background-color: #f44336; /* 예쁜 빨간색 */
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        input[type="button"]:hover {
+            background-color: #e53935;
+        }
+        .ranking-container {
+            width: 25%; /* 랭킹 컨테이너 너비를 조정 */
+            height: 100%; /* 높이를 조정 */
+            background-color: #e0f7fa; /* 랭킹 박스 배경색 */
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .ranking-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .ranking-item {
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<img src="{{ url_for('static', filename='images/logo2.png') }}" alt="NICE Group Logo" class="logo">
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+<div class="main-content">
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
+    </div>
+    <div class="container">
+        <div class="messages">
+            {{ my_variable|safe }}
+        </div>
+        <form id="chat-form" action="/submit" method="post">
+            <textarea id="user_input" name="user_input" placeholder="면접 내용을 입력해주세요."></textarea>
+            <div style="display: flex; gap: 10px;">
+                <input type="submit" value="Submit">
+                <input type="button" value="Reset" onclick="location.href='/reset'">
+            </div>
+        </form>
+    </div>
+    <div class="ranking-container">
+        <div class="ranking-title">Ranking</div>
+        <!-- 랭킹 아이템 예시 -->
+        <div class="ranking-item">1. Item One</div>
+        <div class="ranking-item">2. Item Two</div>
+        <div class="ranking-item">3. Item Three</div>
+    </div>
+</div>
+<script>
+    document.getElementById('chat-form').addEventListener('submit', function() {
+        document.getElementById('loadingOverlay').classList.add('active');
+    });
+</script>
+</body>
+</html>
