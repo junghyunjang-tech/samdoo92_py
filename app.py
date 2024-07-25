@@ -8,7 +8,8 @@ import re
 
 # 환경 변수 로드
 load_dotenv()
-API_KEY = os.environ['OPENAI_API_KEY']
+# API_KEY = os.environ['OPENAI_API_KEY']
+API_KEY = os.getenv['OPENAI_API_KEY']
 print(API_KEY)
 
 client = openai(api_key=API_KEY)
