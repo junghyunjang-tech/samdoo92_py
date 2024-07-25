@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
-import streamlit as st
 import time
 
 load_dotenv()

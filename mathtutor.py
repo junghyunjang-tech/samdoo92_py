@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from pathlib import Path
+import openai
 
 
 load_dotenv()
@@ -54,7 +56,6 @@ client = OpenAI(api_key=API_KEY)
 #
 # print(run)
 
-thread_messages = client.beta.threads.messages.list("thread_m8Vlo6ECI93xxrqjD7TmHvSd")
-
-print(thread_messages.data)
-
+# thread_messages = client.beta.threads.messages.list("thread_m8Vlo6ECI93xxrqjD7TmHvSd")
+#
+# print(thread_messages.data)
