@@ -8,11 +8,19 @@ import re
 
 # 환경 변수 로드
 load_dotenv()
+
+class OpenAI:
+    def __init__(self, api_key):
+        openai.api_key = api_key
+
+    def complete(self, **kwargs):
+        return openai.Completion.create(**kwargs)
+
 # API_KEY = os.environ['OPENAI_API_KEY']
 API_KEY = os.getenv("OPENAI_API_KEY")
 print(API_KEY)
 
-client = openai(api_key=API_KEY)
+client = OpenAI(api_key=API_KEY)
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
