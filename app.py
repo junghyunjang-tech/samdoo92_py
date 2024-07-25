@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from openai import OpenAI
+# from openai import OpenAI
+import openai
 from dotenv import load_dotenv
 import os
 import time
@@ -10,7 +11,7 @@ load_dotenv()
 API_KEY = os.environ['OPENAI_API_KEY']
 print(API_KEY)
 
-client = OpenAI(api_key=API_KEY)
+client = openai(api_key=API_KEY)
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
