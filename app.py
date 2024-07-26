@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-# from openai import OpenAI
-import openai
+from openai import OpenAI
+# import openai
 from dotenv import load_dotenv
 import os
 import time
@@ -9,12 +9,12 @@ import re
 # 환경 변수 로드
 load_dotenv()
 
-class OpenAI:
-    def __init__(self, api_key):
-        openai.api_key = api_key
-
-    def complete(self, **kwargs):
-        return openai.Completion.create(**kwargs)
+# class OpenAI:
+#     def __init__(self, api_key):
+#         openai.api_key = api_key
+#
+#     def complete(self, **kwargs):
+#         return openai.Completion.create(**kwargs)
 
 # API_KEY = os.environ['OPENAI_API_KEY']
 API_KEY = os.getenv("OPENAI_API_KEY")
