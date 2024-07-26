@@ -1,12 +1,11 @@
 /* styles.css */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+body, h1, h2, h3, h4, h5, h6, form, fieldset, dl, dt, dd, p, span, td, th, div, li, ul, button, input, select, textarea, option, form {font-family:'Pretendard'}
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #2C3E50; /* 어두운 네이비 배경색 */
+    background-color: #fff; /* 어두운 네이비 배경색 */
     color: #333; /* 어두운 글자색 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
     margin: 0;
     position: relative;
@@ -14,27 +13,34 @@ body {
 .logo {
     position: absolute;
     top: 20px;
-    left: 20px;
-    width: 150px;
+    left: 50%;transform:translateX(-50%);
+    width: 30px;
 }
 .main-content {
-    display: flex;
-    width: 80%;
-    height: 70vh;
-    background-color: rgba(255, 255, 255, 0.9); /* 반투명 흰색 배경 */
-    padding: 20px;
-    border-radius: 10px;
+    width: 64%;
+    height: calc(100vh - 15vh);
+    background: linear-gradient(#cfddfa, #c9d7fe);
+    border-radius: 30px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    position: relative;
-    z-index: 1;
+    position:absolute;top:calc(50% + 20px);left:10vw;transform:translateY(-50%);
+    z-index: 1;overflow:hidden;
 }
+
+.main_tit {display:flex;justify-content: center;align-items: center;padding:30px 0}
+.main_img {width:56px;height:56px;overflow:hidden;border-radius:50%;margin-right:20px;}
+.main_img img {width:100%}
+.main_txt p {margin:0}
+.main_txt p:first-child{font-size:16px;font-weight: 600;color:#111;padding-bottom:4px;}
+.main_txt p:last-child{font-size:14px;font-weight:600;color:#333}
 .container {
-    width: 80%; /* 이미지 컨테이너 제거로 인해 80%로 조정 */
+    width: calc(100% - 80px); /* 이미지 컨테이너 제거로 인해 80%로 조정 */
+    padding:40px;
     height: 100%;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background:rgba(255,255,255,0.5);border-top-left-radius: 30px;border-top-right-radius: 30px;
 }
 .messages {
     flex: 1;
@@ -43,19 +49,27 @@ body {
     overflow-y: auto;
     padding-right: 10px;
 }
+
+.messages::-webkit-scrollbar{width:6px;background:#fff;border-radius: 6px;}
+.messages::-webkit-scrollbar-thumb{background:#c9d7fe;border-radius: 6px;}
 .message {
-    margin: 10px 0;
-    padding: 10px;
+    margin:16px 0;
+    padding: 20px;
     background-color: #D9EEFA; /* 톤을 살짝 낮춘 배경색 */
-    border-radius: 5px;
+    border-radius: 20px;
     text-align: left;
-    line-height: 1.5;
+    line-height: 28px;
+    font-size:15px;font-weight:500;max-width:80%
 }
 .message.assistant {
-    background-color: #B0D4EF; /* 약간 더 진한 파란색 배경 */
+    background-color: #fff; /* 약간 더 진한 파란색 배경 */
+    align-self:flex-start;
+    border-bottom-left-radius: 0 !important;
 }
 .message.user {
-    background-color: #99CCEE; /* 사용자 메시지 배경 */
+    background-color: #3d8bf0; /* 사용자 메시지 배경 */
+    color:#fff;
+    align-self:flex-end;border-bottom-right-radius: 0 !important;
 }
 form {
     display: flex;
@@ -67,15 +81,15 @@ form {
     width: 100%;
 }
 textarea {
-    padding: 10px;
-    border: 2px solid #043E5A;
-    border-radius: 5px;
-    width: 96%;
-    box-sizing: border-box;
-    height: 80px; /* 메시지 입력 창 높이 줄임 */
-    background-color: #FFFFFF; /* 흰색 배경 */
-    color: #333; /* 어두운 글자색 */
+    padding: 20px;
+    border: 2px solid #c9d7fe;
+    border-radius: 999px;
+    width: calc(100% - 40px);
+    height: 20px;
+    background-color: #FFFFFF;
+    color: #333; font-size:16px;font-weight:600;overflow: hidden;resize: none;
 }
+textarea:focus{outline:none;}
 input[type="submit"], input[type="button"], .view-video-button {
     padding: 10px 20px;
     border: none;
@@ -106,19 +120,19 @@ input[type="button"]:hover {
 }
 .ranking-container {
     width: 20%; /* 크기를 1/5로 조정 */
-    height: 100%;
-    background-color: #D9EEFA; /* 밝은 파란색 배경 */
-    border-radius: 8px;
-    padding: 10px;
+    height: calc(100vh - 30vh);
+    background: linear-gradient(#c2cee7, #e1d7ef);
+    border-top-right-radius: 16px;border-top-left-radius: 16px;
+    padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    position:fixed;bottom:0;right:20px
 }
 .ranking-title {
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size:20px;font-weight:700
 }
 .ranking-item {
     background-color: #FFFFFF; /* 흰색 배경 */

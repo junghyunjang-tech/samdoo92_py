@@ -5,14 +5,26 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-<img src="{{ url_for('static', filename='images/logo2.png') }}" alt="NICE Group Logo" class="logo">
+<img src="{{ url_for('static', filename='images/logo.png') }}" alt="NICE Group Logo" class="logo">
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
 </div>
 <div class="main-content">
-    <div class="image-container">
-        <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
+<!--    <div class="image-container">-->
+<!--        <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">-->
+<!--    </div>-->
+
+    <div class="main_tit">
+        <div class="main_img">
+            <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
+        </div>
+        <div class="main_txt">
+            <p>[NICE ZINIDATA]삼두구이</p>
+            <p>김민수 대표님</p>
+        </div>
+
     </div>
+
     <div class="container">
         <div class="messages">
             {{ my_variable|safe }}
@@ -33,23 +45,24 @@
             <input type="submit" value="Upload">
         </form>
     </div>
-    <div class="ranking-container">
-        <div class="ranking-title">Score Board</div>
-        <table class="ranking-table">
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Score</th>
-            </tr>
-            {% for data in extracted_data %}
-            <tr>
-                <td>{{ data.rank }}</td>
-                <td>{{ data.name }}</td>
-                <td>{{ data.score }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+
+</div>
+<div class="ranking-container">
+    <div class="ranking-title">Score Board</div>
+    <table class="ranking-table">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Score</th>
+        </tr>
+        {% for data in extracted_data %}
+        <tr>
+            <td>{{ data.rank }}</td>
+            <td>{{ data.name }}</td>
+            <td>{{ data.score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 <script>
     document.getElementById('chat-form').addEventListener('submit', function() {
