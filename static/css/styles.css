@@ -1,6 +1,8 @@
 /* styles.css */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+*{list-style: none;padding:0;margin:0}
 body, h1, h2, h3, h4, h5, h6, form, fieldset, dl, dt, dd, p, span, td, th, div, li, ul, button, input, select, textarea, option, form {font-family:'Pretendard'}
 body {
     font-family: 'Roboto', sans-serif;
@@ -26,16 +28,23 @@ body {
     z-index: 1;overflow:hidden;
 }
 
-.main_tit {display:flex;justify-content: center;align-items: center;padding:30px 0}
-.main_img {width:56px;height:56px;overflow:hidden;border-radius:50%;margin-right:20px;}
+.main_tit {display:flex;justify-content: center;align-items: center;height:80px;}
+.main_img {width:56px;height:56px;overflow:hidden;border-radius:50%;margin-right:20px;cursor:pointer;}
 .main_img img {width:100%}
+.main_img:after {content:'';display:inline-block;width:60px;height:60px;}
+
+@keyframes show {
+    0%{width:50px}
+    100%{width:60px}
+}
+
 .main_txt p {margin:0}
-.main_txt p:first-child{font-size:16px;font-weight: 600;color:#111;padding-bottom:4px;}
+.main_txt p:first-child{font-size:16px;font-weight: 600;color:#111;padding-bottom:8px;}
 .main_txt p:last-child{font-size:14px;font-weight:600;color:#333}
 .container {
     width: calc(100% - 80px); /* 이미지 컨테이너 제거로 인해 80%로 조정 */
-    padding:40px;
-    height: 100%;
+    padding:40px 40px 20px 40px;
+    height:calc(100% - 140px);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -76,15 +85,15 @@ form {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 20px;
+    margin-top: 50px;
     gap: 10px;
     width: 100%;
 }
 textarea {
-    padding: 20px;
+    padding: 20px 100px 20px 60px;
     border: 2px solid #c9d7fe;
     border-radius: 999px;
-    width: calc(100% - 40px);
+    width: calc(100% - 160px);
     height: 20px;
     background-color: #FFFFFF;
     color: #333; font-size:16px;font-weight:600;overflow: hidden;resize: none;
@@ -100,11 +109,15 @@ input[type="submit"], input[type="button"], .view-video-button {
     width: 100px;
     margin-right: 10px;
 }
+.form-container {position:relative;}
+.submitBtn {position:absolute;top:calc(50% - 4px);right:0;transform:translateY(-50%);padding:0 !important;font-size:0;width:46px !important;height:46px;border-radius:50% !important;}
+.file-upload{position:absolute;top:0;left:0;}
+.uploadBtn {position:absolute;top:-42px;right:0}
 input[type="submit"] {
-    background-color: #0095DA;
+    background-color: #3d8bf0;
 }
 input[type="submit"]:hover {
-    background-color: #007BB5;
+    background-color: #3378d1;
 }
 input[type="button"] {
     background-color: #FF4B4B;
@@ -122,18 +135,41 @@ input[type="button"]:hover {
     width: 20%; /* 크기를 1/5로 조정 */
     height: calc(100vh - 30vh);
     background: linear-gradient(#c2cee7, #e1d7ef);
-    border-top-right-radius: 16px;border-top-left-radius: 16px;
-    padding: 20px;
+    border-top-right-radius: 30px;border-top-left-radius: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    position:fixed;bottom:0;right:20px
+    position:fixed;bottom:-65vh;right:20px;padding-top:20px;
+
 }
+
+.ranking-container.up {animation: up linear .4s forwards}
+.ranking-container.down {animation: down linear .4s forwards}
+
+@keyframes up {
+    0%{bottom:-65vh}
+    100%{bottom:0}
+}
+
+@keyframes down {
+    0%{bottom:0}
+    100%{bottom:-65vh}
+}
+
 .ranking-title {
-    font-size:20px;font-weight:700
+    font-size:20px;font-weight:700;width:100%;text-align:center;cursor:pointer;
+    height:60px;
 }
+.ranking-tableBox {width:calc(100% - 40px);background:rgba(255,255,255,.5);border-top-right-radius: 30px;border-top-left-radius: 30px;height:100%;padding:20px;overflow-y:scroll;}
+.ranking-tableBox::-webkit-scrollbar{display:none;}
+.ranking-table {width:100%;border-collapse:collapse;border-spacing: 0}
+.ranking-table th {padding:15px 0;font-size:14px;}
+.ranking-table td {padding:15px 0;}
+.ranking-table tr:first-child{color:#333}
+.ranking-table tr {border-bottom:1px solid #e1d7ef;text-align:center;font-size:15px;font-weight:500;color:#888}
+.ranking-table tr:nth-child(2), .ranking-table tr:nth-child(3), .ranking-table tr:nth-child(4), .ranking-table tr:nth-child(5), .ranking-table tr:nth-child(6), .ranking-table tr:nth-child(7), .ranking-table tr:nth-child(8){color:#3d8bf0;font-weight:600}
 .ranking-item {
     background-color: #FFFFFF; /* 흰색 배경 */
     border-radius: 5px;
@@ -189,12 +225,13 @@ input[type="button"]:hover {
 
 .custom-file-upload {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 0;
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: 1px solid #fff;
     border-radius: 4px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     font-size: 14px;
+    position:absolute;top:calc(50% + 34px);left:20px;transform:translateY(-50%);
 }
 
 input[type="file"] {
@@ -204,4 +241,20 @@ input[type="file"] {
 .file-info {
     font-size: 14px;
     color: #888;
+    position:absolute;top:-32px;left:20px;
 }
+.formBox {position:relative;}
+.threads {position:fixed;top:0;right:0;width:20%;height:calc(100vh - 40px);border-left:1px solid #efefef;padding:20px;overflow-y: scroll;margin-bottom:160px}
+.threads::-webkit-scrollbar{display:none;}
+.reset {}
+.sectionThreads {padding:20px;background:rgba(207,221,250,.2);border-radius:16px;margin:20px 0}
+.threadTit {font-size:14px;font-weight:500;color:#777;margin-bottom:10px;}
+.sectionThreads li {padding:10px 0;cursor:pointer;}
+.sectionThreads li:hover {color:#3d8bf0}
+.videoPopup {position:fixed;top:0;left:0;width:100%;height:100vh;z-index:9;display:none;}
+.videoPopup.active {display:block;}
+.bk_bg {position:absolute;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,.4);}
+.videoCont {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60%;height:80vh;background:#fff;border-radius:30px;z-index:9}
+.close {position: absolute;top:-50px;right:10px;width:40px;height:40px;background:#fff;border-radius:50%;cursor:pointer;}
+.close:after {content:'';display:inline-block;width:20px;height:2px;transform:translate(-50%,-50%) rotate(45deg);background:#3d8bf0;position:absolute;top:50%;left: 50%}
+.close:before {content:'';display:inline-block;width:20px;height:2px;transform:translate(-50%,-50%) rotate(-45deg);background:#3d8bf0;position:absolute;top:50%;left: 50%}

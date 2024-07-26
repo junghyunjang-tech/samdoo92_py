@@ -3,7 +3,14 @@
 <head>
     <title>모의면접_삼두구이</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <script type="text/javascript" src="/static/js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui.js"></script>
+
 </head>
+
+<!--전송 버튼, 리셋, 파일, 대표님 사진 액션, 리스트 순위 수정 필요 ##화요일에 할게여!-->
+
 <body>
 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="NICE Group Logo" class="logo">
 <div class="loading-overlay" id="loadingOverlay">
@@ -19,7 +26,7 @@
             <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
         </div>
         <div class="main_txt">
-            <p>[NICE ZINIDATA]삼두구이</p>
+            <p>[NICE ZINIDATA]<!--삼두구이--></p>
             <p>김민수 대표님</p>
         </div>
 
@@ -29,41 +36,82 @@
         <div class="messages">
             {{ my_variable|safe }}
         </div>
+        <div class="formBox">
         <form id="chat-form" action="/submit" method="post" class="form-container">
             <textarea id="user_input" name="user_input" placeholder="면접 내용을 입력해주세요."></textarea>
             <div class="form-actions">
-                <input type="submit" value="Submit">
-                <input type="button" value="Reset" onclick="location.href='/reset'">
+                <input type="submit" value="Submit" class="submitBtn">
             </div>
         </form>
         <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" class="form-actions file-upload">
             <label for="file-upload" class="custom-file-upload">
-                파일 선택
+                <img src="{{ url_for('static', filename='images/folder-solid.svg') }}" alt="Photo">
             </label>
             <input id="file-upload" type="file" name="file" onchange="displayFileName()"/>
             <span class="file-info" id="file-info">선택된 파일 없음</span>
-            <input type="submit" value="Upload">
+            <input type="submit" value="Upload" class="uploadBtn">
         </form>
+        </div>
+    </div>
+
+</div>
+<div class="threads">
+    <input type="button" value="Reset" class="reset" onclick="location.href='/reset'"/>
+
+    <div class="sectionThreads">
+        <p class="threadTit">오늘</p>
+        <ul>
+            <li>면접자 질문
+            </li>
+        </ul>
+    </div>
+    <div class="sectionThreads">
+        <p class="threadTit">지난 7일</p>
+        <ul>
+            <li>
+                면접자 질문2
+            </li>
+            <li>
+                면접자 질문2
+            </li>
+        </ul>
     </div>
 
 </div>
 <div class="ranking-container">
     <div class="ranking-title">Score Board</div>
-    <table class="ranking-table">
-        <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Score</th>
-        </tr>
-        {% for data in extracted_data %}
-        <tr>
-            <td>{{ data.rank }}</td>
-            <td>{{ data.name }}</td>
-            <td>{{ data.score }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="ranking-tableBox">
+        <table class="ranking-table">
+            <colgroup>
+                <col width="20%"/>
+                <col width="40%"/>
+                <col width="40%"/>
+            </colgroup>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            {% for data in extracted_data %}
+            <tr>
+                <td>{{ data.rank }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
+
+<div class="videoPopup">
+    <div class="videoCont">
+        <div class="close"></div>
+
+    </div>
+    <div class="bk_bg"></div>
+</div>
+
+
 <script>
     document.getElementById('chat-form').addEventListener('submit', function() {
         document.getElementById('loadingOverlay').classList.add('active');
@@ -79,6 +127,29 @@
         var fileName = input.files[0] ? input.files[0].name : "선택된 파일 없음";
         infoArea.textContent = fileName;
     }
+
+
+</script>
+
+<script>
+    $(function(){
+        $('.ranking-title').click(function(){
+            $('.ranking-container').toggleClass('up').removeClass('down')
+
+            if(!$('.ranking-container').hasClass('up')){
+                $('.ranking-container').addClass('down')
+            }
+        });
+
+        $('.main_img').click(function(){
+            $('.videoPopup').addClass('active');
+        });
+
+        $('.videoPopup .close, .bk_bg').click(function(){
+            $('.videoPopup').removeClass('active');
+        });
+
+    });
 </script>
 </body>
 </html>
