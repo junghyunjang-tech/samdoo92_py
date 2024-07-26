@@ -35,11 +35,20 @@
     </div>
     <div class="ranking-container">
         <div class="ranking-title">Score Board</div>
-        {% for data in extracted_data %}
-        <div class="ranking-item">
-            이름: {{ data.name }} - 평가 점수: {{ data.score }}
-        </div>
-        {% endfor %}
+        <table class="ranking-table">
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            {% for data in extracted_data %}
+            <tr>
+                <td>{{ data.rank }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 </div>
 <script>

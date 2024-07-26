@@ -1,22 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from openai import OpenAI
-# import openai
 from dotenv import load_dotenv
 import os
 import time
 import re
+import pandas as pd
 
 # 환경 변수 로드
 load_dotenv()
 
-# class OpenAI:
-#     def __init__(self, api_key):
-#         openai.api_key = api_key
-#
-#     def complete(self, **kwargs):
-#         return openai.Completion.create(**kwargs)
-
-# API_KEY = os.environ['OPENAI_API_KEY']
 API_KEY = os.getenv("OPENAI_API_KEY")
 print(API_KEY)
 
@@ -58,33 +50,36 @@ def extract_text(data):
         for content in message['content']:
             text = content['text']['value']
             name_pattern = r"안녕하세요,\s*([가-힣]+)님"
-            # score_pattern = r"평가 점수:\s*(\d\.\d)/5점"
             score_pattern = r"평가 점수:\s*([\d.]+)/5점"
 
-            # 정규 표현식 검색
             name_match = re.search(name_pattern, text)
             score_match = re.search(score_pattern, text)
 
-            # 검색된 결과 저장
             if name_match and score_match:
                 name = name_match.group(1)
-                score = float(score_match.group(1))  # 점수를 float로 변환
+                score = float(score_match.group(1))
                 extracted_data.append({"name": name, "score": score})
-                print(f"이름: {name}")
-                print(f"평가 점수: {score}")
+                print(f"이름: {name}, 평가 점수: {score}")
             else:
                 print("이름 또는 평가 점수를 찾을 수 없습니다.")
 
-    # 세션에 저장된 데이터를 업데이트
     if 'extracted_data' in session:
         session['extracted_data'].extend(extracted_data)
     else:
         session['extracted_data'] = extracted_data
 
-    # 점수 기준으로 정렬 (내림차순)
-    session['extracted_data'] = sorted(session['extracted_data'], key=lambda x: x['score'], reverse=True)
+    df = pd.DataFrame(session['extracted_data'])
+    df['score'] = pd.to_numeric(df['score'])
+    df_sorted = df.sort_values(by='score', ascending=False).reset_index(drop=True)
+    df_sorted['rank'] = df_sorted.index + 1  # 순위 추가
 
-    return extracted_data
+    session['extracted_data'] = df_sorted.to_dict(orient='records')  # DataFrame을 딕셔너리로 변환하여 세션에 저장
+    print("정렬된 데이터:", session['extracted_data'])  # 정렬된 데이터 출력
+
+    return session['extracted_data']
+
+
+
 
 @app.route('/')
 def index():
@@ -101,7 +96,9 @@ def index():
                 html += f'<div class="message {role_class}">{text_value}</div>\n'
 
     extracted_data = session.get('extracted_data', [])
+    print("세션에 저장된 정렬된 데이터:", extracted_data)  # 세션 데이터 출력
     return render_template('index.html', my_variable=html, extracted_data=extracted_data)
+
 
 @app.route('/reset', methods=['GET'])
 def reset():
