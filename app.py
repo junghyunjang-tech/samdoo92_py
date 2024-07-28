@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import time
 import re
 import pandas as pd
+from datetime import datetime
 
 # 환경 변수 로드
 load_dotenv()
@@ -44,6 +45,14 @@ def serialize_message(message):
         ]
     }
 
+def serialize_message_forRetreive(message):
+    content_values = [block.text.value for block in message.content if hasattr(block, 'text') and hasattr(block.text, 'value')]
+    return {
+        "id": message.id,
+        "role": message.role,
+        "content": " ".join(content_values)
+    }
+
 def extract_text(data):
     extracted_data = []
     for message in data:
@@ -55,10 +64,14 @@ def extract_text(data):
             name_match = re.search(name_pattern, text)
             score_match = re.search(score_pattern, text)
 
+            now = datetime.now()
+            formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
+            print("현재 날짜와 시간:", formatted_now)
+
             if name_match and score_match:
                 name = name_match.group(1)
                 score = float(score_match.group(1))
-                extracted_data.append({"name": name, "score": score})
+                extracted_data.append({"name": name, "score": score, "thread_id": session['thread_id'], "created_dt": formatted_now})
                 print(f"이름: {name}, 평가 점수: {score}")
             else:
                 print("이름 또는 평가 점수를 찾을 수 없습니다.")
@@ -84,6 +97,7 @@ def extract_text(data):
 @app.route('/')
 def index():
     if 'reset_done' not in session:
+        reset()
         return redirect(url_for('reset'))
 
     messages = session.get('messages', [])
@@ -97,7 +111,13 @@ def index():
 
     extracted_data = session.get('extracted_data', [])
     print("세션에 저장된 정렬된 데이터:", extracted_data)  # 세션 데이터 출력
-    return render_template('index.html', my_variable=html, extracted_data=extracted_data)
+    # Split threads by date
+    today = datetime.now().strftime("%Y-%m-%d")
+    today_threads = [thread for thread in extracted_data if thread['created_dt'][:10] == today]
+    past_week_threads = [thread for thread in extracted_data if thread['created_dt'][:10] != today]
+
+    return render_template('index.html', my_variable=html, today_threads=today_threads, past_week_threads=past_week_threads, extracted_data=extracted_data)
+    # return render_template('index.html', my_variable=html, extracted_data=extracted_data)
 
 
 @app.route('/reset', methods=['GET'])
@@ -152,6 +172,7 @@ def submit():
         serialized_messages = [serialize_message(message) for message in messages]
         print('serialized_messages', serialized_messages)
         session['messages'] = serialized_messages
+        session['reset_done'] = False
 
         score_message = extract_text(serialized_messages)
         print("score_message :: ", score_message)
@@ -207,6 +228,7 @@ def upload_file():
                 serialized_messages = [serialize_message(message) for message in messages]
                 print('serialized_messages', serialized_messages)
                 session['messages'] = serialized_messages
+                session['reset_done'] = False
 
                 score_message = extract_text(serialized_messages)
                 print("score_message :: ", score_message)
@@ -219,6 +241,18 @@ def upload_file():
             return "파일 인코딩 에러가 발생했습니다. UTF-8 인코딩을 사용해주세요.", 400
 
     return redirect(url_for('index'))
+
+@app.route('/retrieve_thread', methods=['POST'])
+def retrieve_thread():
+    thread_id = request.form['thread_id']
+    try:
+        thread_messages = client.beta.threads.messages.list(thread_id=thread_id).data
+        serialized_messages = [serialize_message_forRetreive(message) for message in thread_messages]
+        session['messages'] = serialized_messages
+        session['thread_id'] = thread_id  # Save the current thread_id in the session
+        return jsonify({"status": "success", "messages": serialized_messages})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

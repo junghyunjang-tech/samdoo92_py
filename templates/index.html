@@ -4,79 +4,64 @@
     <title>모의면접_삼두구이</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
-    <script type="text/javascript" src="/static/js/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/jquery-ui.js"></script>
-
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
 </head>
-
-<!--전송 버튼, 리셋, 파일, 대표님 사진 액션, 리스트 순위 수정 필요 ##화요일에 할게여!-->
-
 <body>
 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="NICE Group Logo" class="logo">
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
 </div>
 <div class="main-content">
-<!--    <div class="image-container">-->
-<!--        <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">-->
-<!--    </div>-->
-
     <div class="main_tit">
         <div class="main_img">
             <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
         </div>
         <div class="main_txt">
-            <p>[NICE ZINIDATA]<!--삼두구이--></p>
+            <p>[NICE ZINIDATA]</p>
             <p>김민수 대표님</p>
         </div>
-
     </div>
-
     <div class="container">
-        <div class="messages">
+        <div class="messages" id="messages">
             {{ my_variable|safe }}
         </div>
         <div class="formBox">
-        <form id="chat-form" action="/submit" method="post" class="form-container">
-            <textarea id="user_input" name="user_input" placeholder="면접 내용을 입력해주세요."></textarea>
-            <div class="form-actions">
-                <input type="submit" value="Submit" class="submitBtn">
-            </div>
-        </form>
-        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" class="form-actions file-upload">
-            <label for="file-upload" class="custom-file-upload">
-                <img src="{{ url_for('static', filename='images/folder-solid.svg') }}" alt="Photo">
-            </label>
-            <input id="file-upload" type="file" name="file" onchange="displayFileName()"/>
-            <span class="file-info" id="file-info">선택된 파일 없음</span>
-            <input type="submit" value="Upload" class="uploadBtn">
-        </form>
+            <form id="chat-form" action="/submit" method="post" class="form-container">
+                <textarea id="user_input" name="user_input" placeholder="면접 내용을 입력해주세요."></textarea>
+                <div class="form-actions">
+                    <input type="submit" value="Submit" class="submitBtn">
+                </div>
+            </form>
+            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" class="form-actions file-upload">
+                <label for="file-upload" class="custom-file-upload">
+                    <img src="{{ url_for('static', filename='images/folder-solid.svg') }}" alt="Photo">
+                </label>
+                <input id="file-upload" type="file" name="file" onchange="displayFileName()"/>
+                <span class="file-info" id="file-info">선택된 파일 없음</span>
+                <input type="submit" value="Upload" class="uploadBtn">
+            </form>
         </div>
     </div>
-
 </div>
 <div class="threads">
     <input type="button" value="Reset" class="reset" onclick="location.href='/reset'"/>
-
     <div class="sectionThreads">
         <p class="threadTit">오늘</p>
         <ul>
-            <li>면접자 질문
-            </li>
+            {% for data in today_threads %}
+            <li data-threadid="{{data.thread_id}}">{{ data.name }} 면접 내용</li>
+            {% endfor %}
         </ul>
     </div>
     <div class="sectionThreads">
         <p class="threadTit">지난 7일</p>
         <ul>
-            <li>
-                면접자 질문2
-            </li>
-            <li>
-                면접자 질문2
-            </li>
+            {% for data in past_week_threads %}
+            <li data-threadid="{{data.thread_id}}">{{ data.name }} 면접 내용</li>
+            {% endfor %}
         </ul>
     </div>
-
 </div>
 <div class="ranking-container">
     <div class="ranking-title">Score Board</div>
@@ -102,15 +87,12 @@
         </table>
     </div>
 </div>
-
 <div class="videoPopup">
     <div class="videoCont">
         <div class="close"></div>
-
     </div>
     <div class="bk_bg"></div>
 </div>
-
 
 <script>
     document.getElementById('chat-form').addEventListener('submit', function() {
@@ -128,11 +110,8 @@
         infoArea.textContent = fileName;
     }
 
-
-</script>
-
-<script>
     $(function(){
+
         $('.ranking-title').click(function(){
             $('.ranking-container').toggleClass('up').removeClass('down')
 
@@ -149,6 +128,27 @@
             $('.videoPopup').removeClass('active');
         });
 
+        $('li[data-threadid]').click(function(){
+            var thread_id = $(this).data('threadid');
+            $.post('/retrieve_thread', {thread_id: thread_id}, function(response) {
+                if (response.status === 'success') {
+                    var messages = response.messages;
+                    var html = '';
+                    messages.forEach(function(message) {
+                        var role_class = message.role === 'assistant' ? 'assistant' : 'user';
+                        html += '<div class="message ' + role_class + '">' + message.content + '</div>\n';
+                    });
+                    $('#messages').html(html);
+                } else {
+                    alert('Error retrieving thread: ' + response.message);
+                }
+            });
+        });
+
+        // Trigger the hidden button for initial loading
+        $('#initial-load').click(function() {
+            window.location.href = '/reset';
+        }).trigger('click');
     });
 </script>
 </body>
