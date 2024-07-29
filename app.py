@@ -59,7 +59,7 @@ def extract_text(data):
         for content in message['content']:
             text = content['text']['value']
             name_pattern = r"안녕하세요,\s*([가-힣]+)님"
-            score_pattern = r"평가 점수:\s*([\d.]+)/5점"
+            score_pattern = r"평가 점수:\s*([\d.]+)/5"
 
             name_match = re.search(name_pattern, text)
             score_match = re.search(score_pattern, text)
@@ -77,7 +77,9 @@ def extract_text(data):
                 print("이름 또는 평가 점수를 찾을 수 없습니다.")
 
     if 'extracted_data' in session:
-        session['extracted_data'].extend(extracted_data)
+        existing_thread_ids = {entry['thread_id'] for entry in session['extracted_data']}
+        new_data = [entry for entry in extracted_data if entry['thread_id'] not in existing_thread_ids]
+        session['extracted_data'].extend(new_data)
     else:
         session['extracted_data'] = extracted_data
 
