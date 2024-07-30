@@ -27,25 +27,23 @@
             {{ my_variable|safe }}
         </div>
         <div class="formBox">
-            <form id="chat-form" action="/submit" method="post" class="form-container">
+            <form id="chat-form" action="/submit" method="post" class="form-container" enctype="multipart/form-data">
                 <textarea id="user_input" name="user_input" placeholder="면접 내용을 입력해주세요."></textarea>
                 <div class="form-actions">
                     <input type="submit" value="Submit" class="submitBtn">
                 </div>
-            </form>
-            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" class="form-actions file-upload">
                 <label for="file-upload" class="custom-file-upload">
                     <img src="{{ url_for('static', filename='images/folder-solid.svg') }}" alt="Photo">
                 </label>
                 <input id="file-upload" type="file" name="file" onchange="displayFileName()"/>
                 <span class="file-info" id="file-info">선택된 파일 없음</span>
-                <input type="submit" value="Upload" class="uploadBtn">
             </form>
         </div>
     </div>
 </div>
 <div class="threads">
-    <input type="button" value="Reset" class="reset" onclick="location.href='/reset'"/>
+    <input type="button" value="Reset" class="reset" id="reset_btn" onclick="location.href='/reset'"/>
+    <input type="button" value="play" class="reset" id="mp3_play_btn">
     <div class="sectionThreads">
         <p class="threadTit">오늘</p>
         <ul>
@@ -98,14 +96,20 @@
     <div class="bk_bg"></div>
 </div>
 
+<audio id="audioPlayer" src="{{ url_for('static', filename='audio/speech.mp3') }}" type="audio/mp3"></audio>
+
 <script>
-    var video = document.getElementById("videoPlayer");
+    const video = document.getElementById("videoPlayer");
+    const audioPlayer    = document.getElementById("audioPlayer");
+    const playBtn = document.getElementById('mp3_play_btn');
 
-    document.getElementById('chat-form').addEventListener('submit', function() {
-        document.getElementById('loadingOverlay').classList.add('active');
-    });
-
-    document.getElementById('upload-form').addEventListener('submit', function() {
+    document.getElementById('chat-form').addEventListener('submit', function(event) {
+        var fileInput = document.getElementById('file-upload');
+        if (fileInput.files.length > 0) {
+            this.action = "/upload";
+        } else {
+            this.action = "/submit";
+        }
         document.getElementById('loadingOverlay').classList.add('active');
     });
 
@@ -116,22 +120,23 @@
         infoArea.textContent = fileName;
     }
 
-    $(function(){
-
-        $('.ranking-title').click(function(){
+    $(function() {
+        $('.ranking-title').click(function () {
             $('.ranking-container').toggleClass('up').removeClass('down')
 
-            if(!$('.ranking-container').hasClass('up')){
+            if (!$('.ranking-container').hasClass('up')) {
                 $('.ranking-container').addClass('down')
             }
         });
 
-        $('.main_img').click(function(){
+        $('.main_img').click(function () {
             document.getElementById('loadingOverlay').classList.add('active');
             $('.videoPopup').addClass('active');
+            audioPlayer.pause();
+            playBtn.value = "pause";
 
             // 서버로 get_last_assistant_message 요청을 보냄
-            $.post('/get_first_assistant_message', function(response) {
+            $.post('/get_first_assistant_message', function (response) {
                 if (response.status === 'success') {
                     document.getElementById('loadingOverlay').classList.remove('active');
                     video.play()
@@ -142,17 +147,19 @@
             });
         });
 
-        $('.videoPopup .close, .bk_bg').click(function(){
+        $('.videoPopup .close, .bk_bg').click(function () {
+            video.pause()
             $('.videoPopup').removeClass('active');
         });
 
-        $('li[data-threadid]').click(function(){
+        $('li[data-threadid]').click(function () {
             var thread_id = $(this).data('threadid');
-            $.post('/retrieve_thread', {thread_id: thread_id}, function(response) {
+            $.post('/retrieve_thread', {thread_id: thread_id}, function (response) {
                 if (response.status === 'success') {
+                    $("#mp3_play_btn").hide()
                     var messages = response.messages;
                     var html = '';
-                    messages.forEach(function(message) {
+                    messages.forEach(function (message) {
                         var role_class = message.role === 'assistant' ? 'assistant' : 'user';
                         html += '<div class="message ' + role_class + '">' + message.content + '</div>\n';
                     });
@@ -164,9 +171,27 @@
         });
 
         // Trigger the hidden button for initial loading
-        $('#initial-load').click(function() {
+        $('#initial-load').click(function () {
             window.location.href = '/reset';
         }).trigger('click');
+
+        playBtn.addEventListener('click', function () {
+            if (audioPlayer.paused || audioPlayer.ended) {
+                audioPlayer.play();
+                playBtn.value = "pause";
+            } else {
+                audioPlayer.pause();
+                playBtn.value = "play";
+            }
+        });
+
+        audioPlayer.addEventListener('ended', function() {
+            playBtn.value = "play";
+        });
+
+        $("#reset_btn").click(function (){
+            $("#mp3_play_btn").show()
+        })
     });
 </script>
 </body>

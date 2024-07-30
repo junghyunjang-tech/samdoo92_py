@@ -231,7 +231,7 @@ input[type="button"]:hover {
     border-radius: 4px;
     background-color: #fff;
     font-size: 14px;
-    position:absolute;top:calc(50% + 34px);left:20px;transform:translateY(-50%);
+    position:absolute;top:calc(50% + -2px);left:20px;transform:translateY(-50%);
 }
 
 input[type="file"] {

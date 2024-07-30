@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify,send_file
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -7,6 +7,7 @@ import re
 import pandas as pd
 from datetime import datetime
 import requests
+from pathlib import Path
 # 환경 변수 로드
 load_dotenv()
 
@@ -129,7 +130,8 @@ def reset():
     # Reset messages and thread_id while keeping extracted_data and ranking
     extracted_data = session.get('extracted_data', [])
     ranking = session.get('ranking', [])
-
+    if 'messages' in session:
+        del session['messages']
     session['messages'] = get_initial_messages()
     thread = client.beta.threads.create()
     session['thread_id'] = thread.id
@@ -141,6 +143,13 @@ def reset():
     session['reset_done'] = True
     session['extracted_data'] = extracted_data  # Preserve extracted data
     session['ranking'] = ranking  # Preserve ranking data
+
+    # 파일 삭제 경로 설정
+    file_path = os.path.join('static', 'audio', 'speech.mp3')
+
+    # 파일이 존재하면 삭제
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
     return redirect(url_for('index'))
 
@@ -174,12 +183,37 @@ def submit():
 
         messages = client.beta.threads.messages.list(thread_id=thread_id).data
         serialized_messages = [serialize_message(message) for message in messages]
+
+        first_message = get_first_assistant_message_from_list(serialized_messages)
+
+        file_path = os.path.join('static', 'audio', 'speech.mp3')
+
+        # 파일이 존재하면 삭제
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        #speech_file_path를 /static/audio/speech.mp3로 설정
+        base_path = Path(__file__).parent
+        speech_file_path = base_path / "static" / "audio" / "speech.mp3"
+
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice="fable",
+            input=first_message
+        )
+        response.stream_to_file(speech_file_path)
+
         print('serialized_messages', serialized_messages)
+        if 'messages' in session:
+            del session['messages']
         session['messages'] = serialized_messages
+
         session['reset_done'] = False
 
         score_message = extract_text(serialized_messages)
         print("score_message :: ", score_message)
+
+
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -231,11 +265,32 @@ def upload_file():
                 messages = client.beta.threads.messages.list(thread_id=thread_id).data
                 serialized_messages = [serialize_message(message) for message in messages]
                 print('serialized_messages', serialized_messages)
+                if 'messages' in session:
+                    del session['messages']
                 session['messages'] = serialized_messages
                 session['reset_done'] = False
 
                 score_message = extract_text(serialized_messages)
                 print("score_message :: ", score_message)
+
+                first_message = get_first_assistant_message_from_list(serialized_messages)
+
+                file_path = os.path.join('static', 'audio', 'speech.mp3')
+
+                # 파일이 존재하면 삭제
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+                #speech_file_path를 /static/audio/speech.mp3로 설정
+                base_path = Path(__file__).parent
+                speech_file_path = base_path / "static" / "audio" / "speech.mp3"
+
+                response = client.audio.speech.create(
+                    model="tts-1",
+                    voice="fable",
+                    input=first_message
+                )
+                response.stream_to_file(speech_file_path)
 
             except Exception as e:
                 print(f"An error occurred: {e}")
@@ -251,9 +306,19 @@ def retrieve_thread():
     thread_id = request.form['thread_id']
     try:
         thread_messages = client.beta.threads.messages.list(thread_id=thread_id).data
+        print(thread_messages)
         serialized_messages = [serialize_message_forRetreive(message) for message in thread_messages]
+        print(serialized_messages)
+        if 'messages' in session:
+            del session['messages']
         session['messages'] = serialized_messages
         session['thread_id'] = thread_id  # Save the current thread_id in the session
+
+        # 첫 번째 assistant 역할의 메시지를 선택
+        first_assistant_message = get_first_assistant_message_from_list(serialized_messages)
+        if first_assistant_message:
+            session['first_assistant_message'] = first_assistant_message
+
         return jsonify({"status": "success", "messages": serialized_messages})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
@@ -263,7 +328,6 @@ def retrieve_thread():
 def get_first_assistant_message():
     messages = session.get('messages', [])
     first_message = get_first_assistant_message_from_list(messages)
-
     # if not first_message:
     #     return jsonify({"status": "error", "message": "No assistant messages found."}), 400
     #
@@ -328,6 +392,44 @@ def get_first_assistant_message():
         else:
             return jsonify({"status": "error", "message": f"Failed to get talk info. Status code: {response.status_code}"}), response.status_code
 
+
+@app.route('/audio_download', methods=['POST'])
+def audio_download():
+    messages = session.get('messages', [])
+    print("messages :: ")
+    print(messages)
+    first_message = get_first_assistant_message_from_list(messages)
+    print("first_message :: ")
+    print(first_message)
+    # 파일 삭제 경로 설정
+    file_path = os.path.join('static', 'audio', 'speech.mp3')
+
+    # 파일이 존재하면 삭제
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    #speech_file_path를 /static/audio/speech.mp3로 설정
+    base_path = Path(__file__).parent
+    speech_file_path = base_path / "static" / "audio" / "speech.mp3"
+
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="fable",
+        input=first_message
+    )
+    response.stream_to_file(speech_file_path)
+
+    return jsonify({"status": "success", "message": "Video downloaded successfully."}), 200
+
+@app.route('/get_audio_file', methods=['GET'])
+def get_audio_file():
+    audio_file_path = "static/audio/speech.mp3"
+
+    if os.path.exists(audio_file_path):
+        return send_file(audio_file_path, as_attachment=True)
+    else:
+        return jsonify({"error": "Audio file not found."}), 404
+
 def get_first_assistant_message_from_list(messages):
     for message in messages:
         if message['role'] == 'assistant':
@@ -336,7 +438,13 @@ def get_first_assistant_message_from_list(messages):
                     return content_block['text']['value']
     return None
 
-
-
+def get_first_assistant_message_from_list_reversed(messages):
+    # 메시지를 역순으로 정렬
+    for message in reversed(messages):
+        if message['role'] == 'assistant':
+            for content_block in message['content']:
+                if 'text' in content_block and 'value' in content_block['text']:
+                    return content_block['text']['value']
+    return None
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
