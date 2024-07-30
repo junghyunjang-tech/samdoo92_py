@@ -1,38 +1,30 @@
 import requests
-import json
+import os
 
-# D-ID API 엔드포인트
-api_url = "https://api.d-id.com/v1/video"
+url = "https://api.d-id.com/talks"
 
-# D-ID API 키
-api_key = "amhqYW5nMDUwMUBnbWFpbC5jb20:KMSpc_ZRgWFlZsDn8Ygd0";
-
-# 헤더
-headers = {
-    "Authorization": f"Bearer amhqYW5nMDUwMUBnbWFpbC5jb20:KMSpc_ZRgWFlZsDn8Ygd0",
-    "Content-Type": "application/json"
-}
-
-# 비디오 생성 요청 데이터
 payload = {
-    "source_url": "https://example.com/image.jpg",  # 이미지 URL
+    "source_url": "https://bigeye.nicebizmap.co.kr/static/bigEye/images/photo.png",  # 여기서 실제 비디오 URL로 대체하세요
     "script": {
         "type": "text",
-        "input": "Hello, this is a test video."  # 스크립트 텍스트
+        "input": "안녕하세요, 박서연입니다.",
+        "subtitles": "false",
+        "provider": {
+            "type": "microsoft",
+            "voice_id": "ko-KR-InJoonNeural"
+        }
     },
     "config": {
-        "stitch": True
+        "fluent": "false",
+        "pad_audio": "0.0"
     }
 }
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json",
+    "authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik53ek53TmV1R3ptcFZTQjNVZ0J4ZyJ9.eyJodHRwczovL2QtaWQuY29tL2ZlYXR1cmVzIjoiIiwiaHR0cHM6Ly9kLWlkLmNvbS9zdHJpcGVfcHJvZHVjdF9pZCI6InByb2RfTHpsZmVjaUdaaVpLTG0iLCJodHRwczovL2QtaWQuY29tL3N0cmlwZV9jdXN0b21lcl9pZCI6ImN1c19RWkhhTXluSERJbXpnVCIsImh0dHBzOi8vZC1pZC5jb20vc3RyaXBlX3Byb2R1Y3RfbmFtZSI6InByby1tb250aC02MCIsImh0dHBzOi8vZC1pZC5jb20vc3RyaXBlX3N1YnNjcmlwdGlvbl9pZCI6InN1Yl8xUGk5MWhKeEVLWjJ6QXluWlNmWFAycjYiLCJodHRwczovL2QtaWQuY29tL3N0cmlwZV9iaWxsaW5nX2ludGVydmFsIjoibW9udGgiLCJodHRwczovL2QtaWQuY29tL3N0cmlwZV9wbGFuX2dyb3VwIjoiZGVpZC1wcm8iLCJodHRwczovL2QtaWQuY29tL3N0cmlwZV9wcmljZV9pZCI6InByaWNlXzFOazNzSkp4RUtaMnpBeW5lanZwcTBweCIsImh0dHBzOi8vZC1pZC5jb20vc3RyaXBlX3ByaWNlX2NyZWRpdHMiOiI2MCIsImh0dHBzOi8vZC1pZC5jb20vY2hhdF9zdHJpcGVfc3Vic2NyaXB0aW9uX2lkIjoiIiwiaHR0cHM6Ly9kLWlkLmNvbS9jaGF0X3N0cmlwZV9wcmljZV9jcmVkaXRzIjoiIiwiaHR0cHM6Ly9kLWlkLmNvbS9jaGF0X3N0cmlwZV9wcmljZV9pZCI6IiIsImh0dHBzOi8vZC1pZC5jb20vcHJvdmlkZXIiOiJnb29nbGUtb2F1dGgyIiwiaHR0cHM6Ly9kLWlkLmNvbS9pc19uZXciOmZhbHNlLCJodHRwczovL2QtaWQuY29tL2FwaV9rZXlfbW9kaWZpZWRfYXQiOiIyMDI0LTA3LTMwVDA5OjA1OjM5LjY4NloiLCJodHRwczovL2QtaWQuY29tL29yZ19pZCI6IiIsImh0dHBzOi8vZC1pZC5jb20vYXBwc192aXNpdGVkIjpbIlN0dWRpbyIsIkNoYXQiXSwiaHR0cHM6Ly9kLWlkLmNvbS9jeF9sb2dpY19pZCI6IiIsImh0dHBzOi8vZC1pZC5jb20vY3JlYXRpb25fdGltZXN0YW1wIjoiMjAyNC0wNy0yNVQwOTo0NTo0NC4yMDRaIiwiaHR0cHM6Ly9kLWlkLmNvbS9hcGlfZ2F0ZXdheV9rZXlfaWQiOiJ2c251a215MXA0IiwiaHR0cHM6Ly9kLWlkLmNvbS91c2FnZV9pZGVudGlmaWVyX2tleSI6InVzZ19rVDIycGFjRmhhQ05GbEpEc1J3Q2QiLCJodHRwczovL2QtaWQuY29tL2hhc2hfa2V5IjoiY3dBLUdIZFg5WDAzSFo4ZzlpNGJaIiwiaHR0cHM6Ly9kLWlkLmNvbS9wcmltYXJ5Ijp0cnVlLCJodHRwczovL2QtaWQuY29tL2VtYWlsIjoibmljZS5pbmp1bmdAZ21haWwuY29tIiwiaHR0cHM6Ly9kLWlkLmNvbS9wYXltZW50X3Byb3ZpZGVyIjoic3RyaXBlIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmQtaWQuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTA1NzkyNTQzODQyOTYyNTk0NTE3IiwiYXVkIjpbImh0dHBzOi8vZC1pZC51cy5hdXRoMC5jb20vYXBpL3YyLyIsImh0dHBzOi8vZC1pZC51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzIyMzMwNDk4LCJleHAiOjE3MjI0MTY4OTgsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgcmVhZDpjdXJyZW50X3VzZXIgdXBkYXRlOmN1cnJlbnRfdXNlcl9tZXRhZGF0YSBvZmZsaW5lX2FjY2VzcyIsImF6cCI6Ikd6ck5JMU9yZTlGTTNFZURSZjNtM3ozVFN3MEpsUllxIn0.3tROUts52Nc0boTcRQ8keRM5vvzYLWDExa-QHiOJU1LSJIACoI-mMFCirMXVIUlxjCAY6Xmgt44_5XlD81Y8pBxkTtW8T35pIXGWd6tKoV2XFShKpwoTKYfWkxoblShomFjW6CahVxnrfHWbKgI6zTjlh18a1nkTh3kqsIffDf3vxmg5z4UEhaMWDBjlsBm62Y1GujQB0HyV2WfZdiWunDI8Vw5Ynx4ASQzErSNyWiDCIuAFeBNdOn0JBSAyK-6uQG2dcMdL1BNRl28t_phVIFczjsUC4GXK6X58Tam_0kA6xEOVBq7IKu8DvOOO_9JkVPqzYa3JH49HO-2l8md31g"
+}
 
-# 요청 보내기
-response = requests.post(api_url, headers=headers, data=json.dumps(payload))
+response = requests.post(url, json=payload, headers=headers)
 
-# 응답 확인
-if response.status_code == 200:
-    video_data = response.json()
-    video_url = video_data['video_url']
-    print(f"Video URL: {video_url}")
-else:
-    print(f"Failed to create video: {response.status_code}")
-    print(response.text)
+print(response.text)

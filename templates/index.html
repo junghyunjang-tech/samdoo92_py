@@ -93,7 +93,7 @@
     </div>
 </div>
 <div class="videoPopup">
-    <div class="videoCont">
+    <div class="videoCont" id="videoCont">
         <div class="close"></div>
         <video id="videoPlayer" width="600" controls>
             <source src="{{ url_for('static', filename='videos/output_video.mp4') }}" type="video/mp4">
@@ -145,14 +145,43 @@
             // 서버로 get_last_assistant_message 요청을 보냄
             $.post('/get_first_assistant_message', function (response) {
                 if (response.status === 'success') {
+                    reloadVideo()
                     document.getElementById('loadingOverlay').classList.remove('active');
-                    video.play()
+                    // 비디오 소스를 업데이트하여 캐시 무효화
                     console.log('Last assistant message: ' + response.message);
                 } else {
                     console.log('Error: ' + response.message);
                 }
             });
         });
+
+        function reloadVideo() {
+            // 비디오 요소를 가져옵니다
+            var videoCont = document.getElementById('videoCont');
+            var videoPlayer = document.getElementById('videoPlayer');
+
+            // 비디오 요소를 제거합니다
+            videoCont.removeChild(videoPlayer);
+
+            // 새로운 비디오 요소를 생성합니다
+            var newVideoPlayer = document.createElement('video');
+            newVideoPlayer.id = 'videoPlayer';
+            newVideoPlayer.width = 600;
+            newVideoPlayer.controls = true;
+
+            var newSource = document.createElement('source');
+            newSource.src = "{{ url_for('static', filename='videos/output_video.mp4') }}";
+            newSource.type = 'video/mp4';
+
+            newVideoPlayer.appendChild(newSource);
+
+            // 비디오 요소를 다시 추가합니다
+            videoCont.appendChild(newVideoPlayer);
+
+            // 비디오를 로드하고 재생합니다
+            newVideoPlayer.load();
+            newVideoPlayer.play();
+        }
 
         $('.videoPopup .close, .bk_bg').click(function () {
             video.pause()
