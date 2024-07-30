@@ -8,14 +8,17 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
 </head>
 <body>
-<img src="{{ url_for('static', filename='images/logo.png') }}" alt="NICE Group Logo" class="logo">
+<img src="{{ url_for('static', filename='images/logo.svg') }}" alt="NICE Group Logo" class="logo">
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
 </div>
 <div class="main-content">
     <div class="main_tit">
-        <div class="main_img">
-            <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
+        <div class="mainImgBox">
+            <div class="main_img">
+                <img src="{{ url_for('static', filename='images/photo.png') }}" alt="Photo">
+            </div>
+            <div class="main_img_bg"></div>
         </div>
         <div class="main_txt">
             <p>[NICE ZINIDATA]</p>
@@ -42,8 +45,12 @@
     </div>
 </div>
 <div class="threads">
+    <div class="resetBtn">
     <input type="button" value="Reset" class="reset" id="reset_btn" onclick="location.href='/reset'"/>
     <input type="button" value="play" class="reset" id="mp3_play_btn">
+
+
+    </div>
     <div class="sectionThreads">
         <p class="threadTit">오늘</p>
         <ul>
