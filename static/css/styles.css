@@ -14,7 +14,7 @@ body {
 }
 .logo {
     position: absolute;
-    top: 20px;
+    top: 25px;
     left: 50%;transform:translateX(-50%);
     width: 30px;
 }
@@ -118,9 +118,11 @@ input[type="submit"], input[type="button"], .view-video-button {
 
 
 .form-container {position:relative;}
-.submitBtn {position:absolute;top:calc(50% - 4px);right:0;transform:translateY(-50%);padding:0 !important;/*font-size:0;*/width:46px !important;height:46px;border-radius:50% !important;}
+.submitBtn {padding:0 !important;width:46px !important;height:46px;border-radius:50% !important;color:transparent !important;z-index:9;position:relative;background:transparent !important;}
 .file-upload{position:absolute;top:0;left:0;}
 .uploadBtn {position:absolute;top:-42px;right:0}
+.submit_btn {position:absolute;top:50%;right:8px;transform:translateY(-50%);background:#3d8bf0 !important;border-radius:50%;width:46px;height:46px;}
+.submit_btn:after {content:'';display:inline-block;width:24px;height:24px;background:url('/static/images/submit.svg') no-repeat center center / 24px 24px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 input[type="submit"] {
     background-color: #3d8bf0;
 }
@@ -239,7 +241,7 @@ input[type="button"]:hover {
     border-radius: 4px;
     background-color: #fff;
     font-size: 14px;
-    position:absolute;top:calc(50% + -2px);left:20px;transform:translateY(-50%);
+    position:absolute;top:50%;left:20px;transform:translateY(-50%);
 }
 
 input[type="file"] {
