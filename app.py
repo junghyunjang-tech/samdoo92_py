@@ -6,11 +6,13 @@ import time
 import re
 import pandas as pd
 from datetime import datetime
-
+import requests
 # 환경 변수 로드
 load_dotenv()
 
 API_KEY = os.getenv("OPENAI_API_KEY")
+DID_KEY = os.getenv("DID_API_KEY")
+
 print(API_KEY)
 
 client = OpenAI(api_key=API_KEY)
@@ -255,6 +257,86 @@ def retrieve_thread():
         return jsonify({"status": "success", "messages": serialized_messages})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
+
+
+@app.route('/get_first_assistant_message', methods=['POST'])
+def get_first_assistant_message():
+    messages = session.get('messages', [])
+    first_message = get_first_assistant_message_from_list(messages)
+
+    # if not first_message:
+    #     return jsonify({"status": "error", "message": "No assistant messages found."}), 400
+    #
+    # url = "https://api.d-id.com/talks"
+    # payload = {
+    #     "source_url": "https://bigeye.nicebizmap.co.kr/static/bigEye/images/photo.png",
+    #     "script": {
+    #         "type": "text",
+    #         "input": first_message,
+    #         "subtitles": "false",
+    #         "provider": {
+    #             "type": "microsoft",
+    #             "voice_id": "ko-KR-InJoonNeural"
+    #         }
+    #     },
+    #     "config": {
+    #         "fluent": "false",
+    #         "pad_audio": "0.0"
+    #     }
+    # }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": f"Bearer {DID_KEY}"
+    }
+    #
+    # create_talk_response = requests.post(url, json=payload, headers=headers)
+    #
+    # if create_talk_response.status_code != 201 or create_talk_response.status_code != 200:
+    #     return jsonify({"status": "error", "message": "Failed to create talk."}), create_talk_response.status_code
+    #
+    # talk_info = create_talk_response.json()
+    # talk_id = talk_info.get('id')
+    talk_id = "tlk_TAq4lE6uzNnKz-Z-Ae8gj";
+
+    if not talk_id:
+        return jsonify({"status": "error", "message": "Talk ID not found."}), 400
+
+    talk_url = f"https://api.d-id.com/talks/{talk_id}"
+    video_dir = 'static/videos'
+    video_path = os.path.join(video_dir, "output_video.mp4")
+
+    # 이미 파일이 존재하는지 확인
+    if os.path.exists(video_path):
+        os.remove(video_path)  # 기존 파일 삭제
+
+    while True:
+        response = requests.get(talk_url, headers=headers)
+        if response.status_code == 200 or response.status_code == 201:
+            talk_info = response.json()
+            video_url = talk_info.get('result_url')
+            if video_url:
+                video_response = requests.get(video_url)
+                if video_response.status_code == 200 or video_response.status_code == 201:
+                    with open(video_path, "wb") as file:
+                        file.write(video_response.content)
+                    return jsonify({"status": "success", "message": "Video downloaded successfully.", "video_path": video_path}), 200
+                else:
+                    return jsonify({"status": "error", "message": f"Failed to download video. Status code: {video_response.status_code}"}), video_response.status_code
+            else:
+                time.sleep(10)
+        else:
+            return jsonify({"status": "error", "message": f"Failed to get talk info. Status code: {response.status_code}"}), response.status_code
+
+def get_first_assistant_message_from_list(messages):
+    for message in messages:
+        if message['role'] == 'assistant':
+            for content_block in message['content']:
+                if 'text' in content_block and 'value' in content_block['text']:
+                    return content_block['text']['value']
+    return None
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

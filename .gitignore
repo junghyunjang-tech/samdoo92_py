@@ -1,2 +1,4 @@
 .env
 uploads/
+static/videos/
+static/audio/

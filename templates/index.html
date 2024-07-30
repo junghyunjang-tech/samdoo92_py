@@ -90,11 +90,17 @@
 <div class="videoPopup">
     <div class="videoCont">
         <div class="close"></div>
+        <video id="videoPlayer" width="600" controls>
+            <source src="{{ url_for('static', filename='videos/output_video.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
     </div>
     <div class="bk_bg"></div>
 </div>
 
 <script>
+    var video = document.getElementById("videoPlayer");
+
     document.getElementById('chat-form').addEventListener('submit', function() {
         document.getElementById('loadingOverlay').classList.add('active');
     });
@@ -121,7 +127,19 @@
         });
 
         $('.main_img').click(function(){
+            document.getElementById('loadingOverlay').classList.add('active');
             $('.videoPopup').addClass('active');
+
+            // 서버로 get_last_assistant_message 요청을 보냄
+            $.post('/get_first_assistant_message', function(response) {
+                if (response.status === 'success') {
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    video.play()
+                    console.log('Last assistant message: ' + response.message);
+                } else {
+                    console.log('Error: ' + response.message);
+                }
+            });
         });
 
         $('.videoPopup .close, .bk_bg').click(function(){
