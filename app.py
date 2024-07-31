@@ -350,48 +350,48 @@ def get_first_assistant_message():
         score = float(score_match.group(1))
         result_text = "안녕하세요," + name + "님 면접 최종점수는" + str(score) + "입니다. 수고하셨습니다.";
     # 파일 삭제 경로 설정
-    file_path = os.path.join('static', 'videos', 'output_video.mp3')
-
-    # 파일이 존재하면 삭제
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-    url = "https://api.d-id.com/talks"
-    payload = {
-        "source_url": "https://bigeye.nicebizmap.co.kr/static/bigEye/images/photo.png",  # 여기서 실제 비디오 URL로 대체하세요
-        "script": {
-            "type": "text",
-            "input": result_text,
-            # "input": "안녕하세요. 삼두구이입니다. 크레딧관계로 테스트말로 대체합니다.",
-            "subtitles": "false",
-            "provider": {
-                "type": "microsoft",
-                "voice_id": "ko-KR-InJoonNeural"
-            }
-        },
-        "config": {
-            "fluent": "false",
-            "pad_audio": "0.0"
-        }
-    }
+    # file_path = os.path.join('static', 'videos', 'output_video.mp3')
+    #
+    # # 파일이 존재하면 삭제
+    # if os.path.exists(file_path):
+    #     os.remove(file_path)
+    #
+    # url = "https://api.d-id.com/talks"
+    # payload = {
+    #     "source_url": "https://bigeye.nicebizmap.co.kr/static/bigEye/images/photo.png",  # 여기서 실제 비디오 URL로 대체하세요
+    #     "script": {
+    #         "type": "text",
+    #         "input": result_text,
+    #         # "input": "안녕하세요. 삼두구이입니다. 크레딧관계로 테스트말로 대체합니다.",
+    #         "subtitles": "false",
+    #         "provider": {
+    #             "type": "microsoft",
+    #             "voice_id": "ko-KR-InJoonNeural"
+    #         }
+    #     },
+    #     "config": {
+    #         "fluent": "false",
+    #         "pad_audio": "0.0"
+    #     }
+    # }
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
         "authorization": f"Bearer {DID_KEY}"
     }
 
-    create_talk_response = requests.post(url, json=payload, headers=headers)
-    str_status_code = str(create_talk_response.status_code)
-    print("str_status_code")
-    print(str_status_code)
-    result_str = str_status_code[:-1]
-    if int(result_str) != 20:
-        return jsonify({"status": "error", "message": "Failed to create talk."}), create_talk_response.status_code
-
-    talk_info = create_talk_response.json()
-    talk_id = talk_info.get('id')
-    print(talk_id)
-    # talk_id = "tlk_TAq4lE6uzNnKz-Z-Ae8gj";
+    # create_talk_response = requests.post(url, json=payload, headers=headers)
+    # str_status_code = str(create_talk_response.status_code)
+    # print("str_status_code")
+    # print(str_status_code)
+    # result_str = str_status_code[:-1]
+    # if int(result_str) != 20:
+    #     return jsonify({"status": "error", "message": "Failed to create talk."}), create_talk_response.status_code
+    #
+    # talk_info = create_talk_response.json()
+    # talk_id = talk_info.get('id')
+    # print(talk_id)
+    talk_id = "tlk_Smml45RinCzkmtA4nMrhD";
 
     if not talk_id:
         return jsonify({"status": "error", "message": "Talk ID not found."}), 400
