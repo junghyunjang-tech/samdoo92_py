@@ -139,8 +139,11 @@
         $('.main_img').click(function () {
             document.getElementById('loadingOverlay').classList.add('active');
             $('.videoPopup').addClass('active');
-            audioPlayer.pause();
-            playBtn.value = "pause";
+            if (!audioPlayer.paused) {
+                // 오디오가 재생 중일 때 실행될 코드
+                audioPlayer.pause();
+                playBtn.value = "pause";
+            }
 
             // 서버로 get_last_assistant_message 요청을 보냄
             $.post('/get_first_assistant_message', function (response) {
