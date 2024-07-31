@@ -328,6 +328,7 @@ def retrieve_thread():
 def get_first_assistant_message():
     messages = session.get('messages', [])
     first_message = get_first_assistant_message_from_list(messages)
+    print("first_message")
     print(first_message)
 
     if not first_message:
@@ -349,6 +350,8 @@ def get_first_assistant_message():
         name = name_match.group(1)
         score = float(score_match.group(1))
         result_text = "안녕하세요," + name + "님 면접 최종점수는" + str(score) + "입니다. 수고하셨습니다.";
+        print("result_text")
+        print(result_text)
     # 파일 삭제 경로 설정
     # file_path = os.path.join('static', 'videos', 'output_video.mp3')
     #
@@ -471,9 +474,20 @@ def get_audio_file():
 def get_first_assistant_message_from_list(messages):
     for message in messages:
         if message['role'] == 'assistant':
-            for content_block in message['content']:
-                if 'text' in content_block and 'value' in content_block['text']:
-                    return content_block['text']['value']
+            content = message['content']
+            # content가 문자열인 경우
+            if isinstance(content, str):
+                return content
+            # content가 리스트인 경우
+            elif isinstance(content, list):
+                for content_block in content:
+                    if isinstance(content_block, dict):
+                        # 'text' 키가 있고 그 안에 'value'가 있는 경우
+                        if 'text' in content_block and 'value' in content_block['text']:
+                            return content_block['text']['value']
+                    # content_block이 문자열일 경우
+                    elif isinstance(content_block, str):
+                        return content_block
     return None
 
 def get_first_assistant_message_from_list_reversed(messages):
