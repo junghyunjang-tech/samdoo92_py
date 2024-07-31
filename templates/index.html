@@ -28,6 +28,10 @@
     <div class="container">
         <div class="messages" id="messages">
             {{ my_variable|safe }}
+
+            <div class="playBtn">
+                <input type="button" value="play" class="reset" id="mp3_play_btn" title="음성으로 듣기"/>
+            </div>
         </div>
         <div class="formBox">
             <form id="chat-form" action="/submit" method="post" class="form-container" enctype="multipart/form-data">
@@ -46,10 +50,7 @@
 </div>
 <div class="threads">
     <div class="resetBtn">
-    <input type="button" value="Reset" class="reset" id="reset_btn" onclick="location.href='/reset'"/>
-    <input type="button" value="play" class="reset" id="mp3_play_btn">
-
-
+        <input type="button" value="Reset" class="reset" id="reset_btn" title="새 채팅" onclick="location.href='/reset'"/>
     </div>
     <div class="sectionThreads">
         <p class="threadTit">오늘</p>

@@ -15,7 +15,7 @@ body {
 .logo {
     position: absolute;
     top: 25px;
-    left: 50%;transform:translateX(-50%);
+    left: calc(50% - 190px);transform:translateX(-50%);
     width: 30px;
 }
 .main-content {
@@ -87,7 +87,7 @@ form {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 50px;
+    margin-top: 34px;
     gap: 10px;
     width: 100%;
 }
@@ -112,16 +112,24 @@ input[type="submit"], input[type="button"], .view-video-button {
     margin-right: 10px;
 }
 
-#reset_btn {background:transparent !important;border:1px solid #002555 !important;color:transparent !important;border-radius: 50% !important;cursor: pointer;font-weight: 500;width: 50px !important;height:50px !important;}
-.resetBtn {position: relative;}
-.resetBtn:after {content:'';display:inline-block;width:40px;height:40px;background:url('/static/images/logo.svg') no-repeat center center / 30px 30px;position:absolute;top:50%;left:5px;transform:translateY(-50%);z-index:-9}
-
+.messages {position:relative;}
+#reset_btn {background:transparent !important;border:0 !important;color:transparent !important;border-radius: 50% !important;cursor: pointer;font-weight: 500;width: 50px !important;height:50px !important;}
+.resetBtn {position: relative;background:#FAFAFB;border-radius:16px;}
+.resetBtn:hover {background:#F1F1F3;}
+.resetBtn #reset_btn {width:100% !important;margin-right:0 !important;position:relative;z-index:9}
+.resetBtn:after {content:'';display:inline-block;width:40px;height:40px;background:url('/static/images/new.svg') no-repeat center center / 24px 24px;position:absolute;top:50%;left:5px;transform:translateY(-50%);z-index:1}
+.resetBtn:before {content:'NEW CHAT';font-size:15px;position:absolute;top:50%;left:48px;transform:translateY(-50%);font-family:'Pretendard';font-weight:500;color:#002555}
+.playBtn{position:absolute;bottom:-5px;left:0;background:transparent !important;}
+.playBtn #mp3_play_btn {background:transparent !important;color:transparent !important;padding:0 !important;}
+.playBtn:after {content:'';display:inline-block;position: absolute;top:50%;left:0;transform:translateY(-50%);background:url('/static/images/play.svg') no-repeat center center / 24px 24px;width:24px;height:24px;z-index:-1}
+.playBtn:hover:after {content:'';background:url('/static/images/play_blue.svg') no-repeat center center / 24px 24px;}
 
 .form-container {position:relative;}
 .submitBtn {padding:0 !important;width:46px !important;height:46px;border-radius:50% !important;color:transparent !important;z-index:9;position:relative;background:transparent !important;}
 .file-upload{position:absolute;top:0;left:0;}
 .uploadBtn {position:absolute;top:-42px;right:0}
 .submit_btn {position:absolute;top:50%;right:8px;transform:translateY(-50%);background:#3d8bf0 !important;border-radius:50%;width:46px;height:46px;}
+.submit_btn:hover {background:#3378d1 !important;}
 .submit_btn:after {content:'';display:inline-block;width:24px;height:24px;background:url('/static/images/submit.svg') no-repeat center center / 24px 24px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
 input[type="submit"] {
     background-color: #3d8bf0;
@@ -251,7 +259,7 @@ input[type="file"] {
 .file-info {
     font-size: 14px;
     color: #888;
-    position:absolute;top:-32px;left:20px;
+    position:absolute;top:-22px;left:20px;
 }
 .formBox {position:relative;}
 .threads {position:fixed;top:0;right:0;width:20%;height:calc(100vh - 40px);border-left:1px solid #efefef;padding:20px;overflow-y: scroll;margin-bottom:160px}
