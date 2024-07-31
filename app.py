@@ -380,7 +380,7 @@ def get_first_assistant_message():
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "authorization": f"Bearer {DID_KEY}"
+        "authorization": f"Basic {DID_KEY}"
     }
 
     # create_talk_response = requests.post(url, json=payload, headers=headers)
